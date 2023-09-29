@@ -1,71 +1,107 @@
 import { Component } from 'react';
-// import { fetchRequest } from 'services/api';
 
-const KEY = '38889526-086820321c5fcbdbccd359080';
-const BASE_URL = 'https://pixabay.com/api/';
+import { fetchRequest } from 'services/api';
+import { Loader } from 'components/Loader/Loader';
+import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
+import { Modal } from 'components/Modal/Modal';
+
 
 export class ImageGallery extends Component {
   state = {
+    requestName: '',
     request: null,
+    loading: false,
+    modal: {
+      isOpen: false,
+      data: null,
+    },
+    error: null,
+    page: 1,
   };
 
-  //  fetchPostById = async () => {
-  //     try {
-  //       this.setState({ isLoading: true });
-  //       const post = await findPostById(this.state.searchedPostId);
 
-  //       this.setState({ posts: [post] });
-  //     } catch (error) {
-  //       this.setState({ error: error.message });
-  //     } finally {
-  //       this.setState({ isLoading: false });
-  //     }
-  //       };
+  getRequestedImages = async () => {
+    try {
+      this.setState({ isLoading: true });
+      const request = await fetchRequest(this.state.request);
 
-  //     getRequest = async () => {
-  //         try { }
-  //     }
+      this.setState({ request: request });
+    } catch (error) {
+      this.setState({ error: error.message });
+    } finally {
+      this.setState({ loading: false });
+    }
+  };
 
   componentDidUpdate(prevProps, prevState) {
     const prevRequest = prevProps.requestName;
     const nextRequest = this.props.requestName;
+    const { requestName } = this.state;
 
     if (prevRequest !== nextRequest) {
-      fetch(`${BASE_URL}?key=${KEY}&q=${nextRequest}`)
-        .then(res => res.json())
-        .then(request => this.setState({ request }));
+      this.setState({ loading: true });
+
+      this.setState({ request: [] });
+      this.getRequestedImages(requestName);
+
     }
   }
 
-  render() {
-    //   return <ul className="gallery">{this.props.requestName}</ul>;
+  
+    // componentDidUpdate(prevProps, prevState) {
+    //   const prevRequest = prevProps.requestName;
+    //   const nextRequest = this.props.requestName;
 
-    return (
-      <ul>
-        {Array.isArray(this.state.request) &&
-          this.state.request.map(
-            ({ id, webformatURL, largeImageURL, tags }) => {
-              return (
-                <li key={id}>
-                  <img src={webformatURL} alt={tags} />
-                </li>
-              );
-            }
+    //   if (prevRequest !== nextRequest) {
+    //     this.setState({ loading: true });
+
+    //     fetch(`${BASE_URL}?key=${KEY}&q=${nextRequest}`)
+    //       .then(res => res.json())
+    //       .then(request => this.setState({ request }))
+    //       .finally(() => this.setState({ loading: false }));
+    //   }
+    // }
+
+    onOpenModal = modalData => {
+      this.setState({
+        modal: {
+          isOpen: true,
+          data: modalData,
+        },
+      });
+    };
+
+    onCloseModal = () => {
+      this.setState({
+        modal: {
+          isOpen: false,
+          data: null,
+        },
+      });
+    };
+
+    render() {
+      const showImg =
+        Array.isArray(this.state.request) && this.state.request.length;
+      
+      const { modal } = this.state;
+      return (
+        <>
+          {this.state.loading && <Loader />}
+          <h2>Result "{this.props.requestName}"</h2>
+          <ul>
+           { showImg && <ImageGalleryItem
+              data={this.state.request}
+              onOpenModal={this.onOpenModal}
+            />}
+          </ul>
+          {modal.isOpen && (
+            <Modal onCloseModal={this.onCloseModal}>
+              <h3>Content modal</h3>
+            </Modal>
           )}
-      </ul>
-    );
+        </>
+      );
+    }
   }
-}
-
-///////
-// {showPosts &&
-//               this.state.posts.map(post => {
-//                 return (
-//                   <li key={post.id} className="postListItem">
-//                     <span>Id: {post.id}</span>
-//                     <h3>Title: {post.title}</h3>
-//                     <h4>User Id: {post.userId}</h4>
-//                     <p>Body: {post.body}</p>
-//                   </li>
-//                 );
-//               })}
+               
