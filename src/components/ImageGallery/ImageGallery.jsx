@@ -4,28 +4,27 @@ import { fetchRequest } from 'services/api';
 import { Loader } from 'components/Loader/Loader';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Modal } from 'components/Modal/Modal';
-
+import { StyledGallery } from './ImageGallery.styled';
 
 export class ImageGallery extends Component {
   state = {
-    requestName: '',
     request: null,
     loading: false,
     modal: {
       isOpen: false,
       data: null,
+      tags: '',
     },
-    error: null,
+    error: '',
     page: 1,
   };
 
-
-  getRequestedImages = async () => {
+  getRequestedImages = async name => {
     try {
       this.setState({ isLoading: true });
-      const request = await fetchRequest(this.state.request);
+      const request = await fetchRequest(name);
 
-      this.setState({ request: request });
+      this.setState({ request: request.hits });
     } catch (error) {
       this.setState({ error: error.message });
     } finally {
@@ -36,72 +35,62 @@ export class ImageGallery extends Component {
   componentDidUpdate(prevProps, prevState) {
     const prevRequest = prevProps.requestName;
     const nextRequest = this.props.requestName;
-    const { requestName } = this.state;
 
     if (prevRequest !== nextRequest) {
       this.setState({ loading: true });
 
-      this.setState({ request: [] });
-      this.getRequestedImages(requestName);
-
+      // this.setState({ request: [] });
+      this.getRequestedImages(nextRequest);
     }
   }
 
-  
-    // componentDidUpdate(prevProps, prevState) {
-    //   const prevRequest = prevProps.requestName;
-    //   const nextRequest = this.props.requestName;
+  onOpenModal = (modalData, tags) => {
+    this.setState({
+      modal: {
+        isOpen: true,
+        data: modalData,
+        tags,
+      },
+    });
+  };
 
-    //   if (prevRequest !== nextRequest) {
-    //     this.setState({ loading: true });
+  onCloseModal = () => {
+    this.setState({
+      modal: {
+        isOpen: false,
+        data: null,
+      },
+    });
+  };
 
-    //     fetch(`${BASE_URL}?key=${KEY}&q=${nextRequest}`)
-    //       .then(res => res.json())
-    //       .then(request => this.setState({ request }))
-    //       .finally(() => this.setState({ loading: false }));
-    //   }
-    // }
+  render() {
+    const showImg =
+      Array.isArray(this.state.request) && this.state.request.length;
 
-    onOpenModal = modalData => {
-      this.setState({
-        modal: {
-          isOpen: true,
-          data: modalData,
-        },
-      });
-    };
+    const { modal, loading, error  } = this.state;
+    return (
+      <>
+        {loading && <Loader />}
 
-    onCloseModal = () => {
-      this.setState({
-        modal: {
-          isOpen: false,
-          data: null,
-        },
-      });
-    };
+        {showImg && (
+          <>
+            <h2>Result "{this.props.requestName}"</h2>
+            <StyledGallery>
+              <ImageGalleryItem
+                data={this.state.request}
+                onOpenModal={this.onOpenModal}
+              />
+            </StyledGallery>
+          </>
+        )}
+        {/* {error && <p>Ooops, we couldn't find this request</p>} */}
 
-    render() {
-      const showImg =
-        Array.isArray(this.state.request) && this.state.request.length;
-      
-      const { modal } = this.state;
-      return (
-        <>
-          {this.state.loading && <Loader />}
-          <h2>Result "{this.props.requestName}"</h2>
-          <ul>
-           { showImg && <ImageGalleryItem
-              data={this.state.request}
-              onOpenModal={this.onOpenModal}
-            />}
-          </ul>
-          {modal.isOpen && (
-            <Modal onCloseModal={this.onCloseModal}>
-              <h3>Content modal</h3>
-            </Modal>
-          )}
-        </>
-      );
-    }
+        {modal.isOpen && (
+          <Modal onCloseModal={this.onCloseModal}>
+            <img src={modal.data} alt={modal.tags} />
+          </Modal>
+        )}
+      </>
+    );
   }
-               
+}

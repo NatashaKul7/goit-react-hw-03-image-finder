@@ -1,12 +1,13 @@
+import { StyledGalleryItem } from "./ImageGalleryItem.styled";
+
 export const ImageGalleryItem = ({ data, onOpenModal }) => {
-    console.log(data)
   return (
     <div>
       {data.map(({ id, largeImageURL, webformatURL, tags }) => {
         return (
-          <li key={id} onClick={() => onOpenModal(largeImageURL)}>
+          <StyledGalleryItem key={id} onClick={() => onOpenModal(largeImageURL, tags)}>
                 <img src={webformatURL} alt={tags} />
-          </li>
+          </StyledGalleryItem>
         );
       })}
     </div>
