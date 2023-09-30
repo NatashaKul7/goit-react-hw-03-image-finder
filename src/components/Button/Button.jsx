@@ -1,7 +1,9 @@
-import { ButtonBox } from "./Button.styled"
+import { ButtonBox } from './Button.styled';
 
-export const Button = () => { 
-    return (
-        <ButtonBox type="submit">Load more</ButtonBox>
-    )
-}
+export const Button = ({ onClick }) => {
+  return (
+    <ButtonBox type="submit" onClick={() => onClick()}>
+      Load more
+    </ButtonBox>
+  );
+};

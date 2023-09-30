@@ -16,7 +16,6 @@ export class Searchbar extends Component {
 
     if (this.state.requestName.trim() === '') {
       return toast.error('Please write your request');
-      
     }
 
     this.props.onSubmit(this.state.requestName);

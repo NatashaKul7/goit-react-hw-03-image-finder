@@ -1,11 +1,9 @@
 import { Component } from 'react';
 import { ToastContainer } from 'react-toastify';
 
-// import { Button } from 'components/Button/Button';
 import { Searchbar } from 'components/Searchbar/Searchbar';
 import { ImageGallery } from 'components/ImageGallery/ImageGallery';
 import { Container } from './App.styled';
-
 
 export class App extends Component {
   state = {
@@ -20,9 +18,7 @@ export class App extends Component {
     return (
       <Container>
         <Searchbar onSubmit={this.handleSearchSubmit} />
-        <ImageGallery requestName={ this.state.requestName} />
-
-    
+        <ImageGallery requestName={this.state.requestName} />
         <ToastContainer autoClose={3000} />
       </Container>
     );

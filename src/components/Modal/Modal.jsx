@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { ModalBox, Overlay } from './Modal.styled';
+import {  Overlay } from './Modal.styled';
 
 export class Modal extends Component {
   componentDidMount() {
@@ -25,7 +25,7 @@ export class Modal extends Component {
   render() {
     return (
       <Overlay onClick={this.onOverlayClick}>
-        <ModalBox>{this.props.children}</ModalBox>
+        <div>{this.props.children}</div>
       </Overlay>
     );
   }
