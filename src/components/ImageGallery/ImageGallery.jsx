@@ -5,6 +5,7 @@ import { Loader } from 'components/Loader/Loader';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Modal } from 'components/Modal/Modal';
 import { StyledGallery } from './ImageGallery.styled';
+import { Button } from 'components/Button/Button';
 
 export class ImageGallery extends Component {
   state = {
@@ -15,11 +16,44 @@ export class ImageGallery extends Component {
       data: null,
       tags: '',
     },
-    error: '',
+    error: null,
     page: 1,
   };
 
-  getRequestedImages = async name => {
+  componentDidUpdate(prevProps, prevState) {
+    const prevRequest = prevProps.requestName;
+    const nextRequest = this.props.requestName;
+
+    if (prevRequest !== nextRequest) {
+      this.setState({ loading: true, request: null });
+
+      this.getRequestedImages(nextRequest);
+    }
+  }
+
+
+  ///  с loadMore
+  // getRequestedImages = async (name, page) => {
+  //   try {
+  //     this.setState({ isLoading: true });
+  //     const { hits, totalHits } = await fetchRequest(name, page);
+  //     // console.log(request)
+
+  //     // this.setState({ request: request.hits });
+
+  //     this.setState(prevState => ({
+  //       request: [...(prevState.request || []), ...hits],
+  //       page: prevState.page + 1,
+  //     }));
+  //   } catch (error) {
+  //     this.setState({ error: error.message });
+  //   } finally {
+  //     this.setState({ loading: false });
+  //   }
+  // };
+
+
+    getRequestedImages = async name => {
     try {
       this.setState({ isLoading: true });
       const request = await fetchRequest(name);
@@ -32,17 +66,11 @@ export class ImageGallery extends Component {
     }
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    const prevRequest = prevProps.requestName;
-    const nextRequest = this.props.requestName;
-
-    if (prevRequest !== nextRequest) {
-      this.setState({ loading: true });
-
-      // this.setState({ request: [] });
-      this.getRequestedImages(nextRequest);
-    }
-  }
+  onLoadMore = () => {
+    const { page } = this.state;
+    const { requestName } = this.props;
+    this.getRequestedImages(requestName, page)
+  };
 
   onOpenModal = (modalData, tags) => {
     this.setState({
@@ -67,10 +95,11 @@ export class ImageGallery extends Component {
     const showImg =
       Array.isArray(this.state.request) && this.state.request.length;
 
-    const { modal, loading, error  } = this.state;
+    const { modal, loading, request, error } = this.state;
     return (
       <>
         {loading && <Loader />}
+        {error && <h3>{error.message}</h3>}
 
         {showImg && (
           <>
@@ -83,8 +112,7 @@ export class ImageGallery extends Component {
             </StyledGallery>
           </>
         )}
-        {/* {error && <p>Ooops, we couldn't find this request</p>} */}
-
+        {request && <Button onClick={this.onLoadMore} />}
         {modal.isOpen && (
           <Modal onCloseModal={this.onCloseModal}>
             <img src={modal.data} alt={modal.tags} />

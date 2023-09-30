@@ -5,6 +5,9 @@ export const ButtonBox = styled.button`
 margin-right: auto;
 margin-left: auto;
 align-items: flex-end; */
+
+width: 30px;
+margin-left: 24px;
   padding: 8px 16px;
   border-radius: 2px;
   background-color: #3f51b5;
