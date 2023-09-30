@@ -19,6 +19,7 @@ export class ImageGallery extends Component {
     page: 1,
     status: 'idle',
     hasMore: false,
+    totalImages: 0,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -45,7 +46,13 @@ export class ImageGallery extends Component {
           page: prevState.page + 1,
           hasMore: true,
         }));
+      } else if (this.state.request === 1) {
+        this.setState({ status: 'resolved', hasMore: false });
       } else {
+        this.setState({ status: 'resolved', hasMore: false });
+      }
+
+      if (request.totalHits === 0) {
         throw new Error("Ooops, we couldn't find such images");
       }
     } catch (error) {
