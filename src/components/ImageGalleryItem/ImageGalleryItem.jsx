@@ -2,7 +2,7 @@ import { StyledGalleryItem } from './ImageGalleryItem.styled';
 
 export const ImageGalleryItem = ({ data, onOpenModal }) => {
   return (
-    <div>
+    <>
       {data.map(({ id, largeImageURL, webformatURL, tags }) => {
         return (
           <StyledGalleryItem
@@ -13,6 +13,6 @@ export const ImageGalleryItem = ({ data, onOpenModal }) => {
           </StyledGalleryItem>
         );
       })}
-    </div>
+    </>
   );
 };

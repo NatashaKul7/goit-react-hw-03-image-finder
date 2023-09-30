@@ -6,6 +6,7 @@ import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Modal } from 'components/Modal/Modal';
 import { StyledGallery } from './ImageGallery.styled';
 import { Button } from 'components/Button/Button';
+import { scrollToBottom } from 'utils/scroll';
 
 export class ImageGallery extends Component {
   state = {
@@ -37,14 +38,17 @@ export class ImageGallery extends Component {
   getRequestedImages = async (name, page) => {
     try {
       this.setState({ status: 'pending' });
-      const request = await fetchRequest(name, page);
+      const {hits, totalHits} = await fetchRequest(name, page);
 
-      if (request.hits.length > 0) {
+
+
+      if (hits.length > 0) {
         this.setState(prevState => ({
-          request: [...prevState.request, ...request.hits],
+          request: [...prevState.request, ...hits],
           status: 'resolved',
           page: prevState.page + 1,
-          hasMore: true,
+          hasMore: this.state.page < Math.ceil(totalHits / 12)
+        
         }));
       } else if (this.state.request === 1) {
         this.setState({ status: 'resolved', hasMore: false });
@@ -52,7 +56,7 @@ export class ImageGallery extends Component {
         this.setState({ status: 'resolved', hasMore: false });
       }
 
-      if (request.totalHits === 0) {
+      if (totalHits === 0) {
         throw new Error("Ooops, we couldn't find such images");
       }
     } catch (error) {
@@ -68,6 +72,7 @@ export class ImageGallery extends Component {
     const { page } = this.state;
     const { requestName } = this.props;
     this.getRequestedImages(requestName, page);
+    scrollToBottom();
   };
 
   onOpenModal = (modalData, tags) => {
